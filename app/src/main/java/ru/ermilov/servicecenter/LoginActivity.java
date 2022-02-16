@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -56,9 +57,12 @@ public class LoginActivity extends AppCompatActivity {
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
                         Users user = ds.getValue(Users.class);
                         if (user.name.equals(login) && user.password.equals(password)) {
-                            Toast.makeText(LoginActivity.this, "Успех", Toast.LENGTH_SHORT).show();
+
                             isLogin = true;
-                            break;
+
+                            // Переход на MainActivity
+                            Intent intent = new Intent(this,MainActivity.class);
+                            startActivity(intent);
                         }
                     }
                     if (!isLogin)
