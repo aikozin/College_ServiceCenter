@@ -6,4 +6,15 @@
     <string name="password">Пароль</string>
     <string name="input_password">Введите пароль</string>
     <string name="input">Войти</string>
+    <string name="search">Поиск</string>
+    <string name="Client">Клиенты</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="addClient">Добавить клиента</string>
+    <string name="new_client">Новый клиент</string>
+    <string name="sozdat">Создать</string>
+    <string name="Profil">Профиль</string>
+    <string name="nameClient">Введите Ф.И.О</string>
+    <string name="e_mail">Введите E_mail</string>
+    <string name="phone">Введите номер телефона</string>
 </resources>

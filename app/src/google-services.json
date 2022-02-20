@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "399573444032",
+    "firebase_url": "https://servicecenter-7a878-default-rtdb.firebaseio.com",
+    "project_id": "servicecenter-7a878",
+    "storage_bucket": "servicecenter-7a878.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:399573444032:android:047899fe05d9059335d425",
+        "android_client_info": {
+          "package_name": "ru.ermilov.servicecenter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "399573444032-v6m3hm4d1pdjcm231ub123hq72a7ad4k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDS2UC3767HpfF_D7u0GmNByvOVGq4RANE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "399573444032-v6m3hm4d1pdjcm231ub123hq72a7ad4k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
