@@ -4,9 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".AddClientFragment"
-   >
-
+    tools:context=".AddClientFragment">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/addClient"
@@ -31,13 +29,6 @@
             android:textColor="@color/white"
             android:textSize="18dp"
             android:textStyle="bold" />
-
-
     </androidx.cardview.widget.CardView>
-
-
-
-
-
 
 </FrameLayout>

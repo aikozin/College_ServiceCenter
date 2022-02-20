@@ -2,6 +2,7 @@ package ru.ermilov.servicecenter;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
@@ -11,13 +12,15 @@ import android.widget.FrameLayout;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static FragmentManager fm;
     private CardView addClient;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        fm = getSupportFragmentManager();
 
         addClient = (CardView) findViewById(R.id.client_CardView);
 
@@ -31,8 +34,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void setNewFragment(){
         AddClientFragment addClientFragment = new AddClientFragment(); // создание объекта
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction(); // создание объекта для подгрузки фрагмента
-        ft.replace(R.id.add_client,addClientFragment);//замена текущего содержимого на новое содержимое
+        FragmentTransaction ft = fm.beginTransaction(); // создание объекта для подгрузки фрагмента
+        ft.replace(R.id.add_client, addClientFragment);//замена текущего содержимого на новое содержимое
         ft.commit();// сохранение
+    }
+
+    public static void setFragmentFormClient() {
+        FormClientFragment formClientFragment = new FormClientFragment();
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(R.id.add_client, formClientFragment);
+        ft.commit();
     }
 }
