@@ -7,66 +7,15 @@
     tools:context=".MainActivity">
 
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/search_cardView"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:cardBackgroundColor="#7CAFEB"
-        app:cardCornerRadius="100dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp">
-
-            <ImageView
-                android:id="@+id/search_image"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_marginStart="16dp"
-                android:src="@drawable/ic_baseline_search_24"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <EditText
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:background="@android:color/transparent"
-                android:hint="@string/search"
-                android:singleLine="true"
-                android:textColor="@color/white"
-                android:textColorHint="#E4E4E4"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/search_image"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="SpeakableTextPresentCheck,SpeakableTextPresentCheck,TouchTargetSizeCheck,TouchTargetSizeCheck" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    </androidx.cardview.widget.CardView>
-
     <FrameLayout
         android:id="@+id/add_client"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
 
         app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search_cardView">
+        app:layout_constraintTop_toTopOf="parent">
 
     </FrameLayout>
 

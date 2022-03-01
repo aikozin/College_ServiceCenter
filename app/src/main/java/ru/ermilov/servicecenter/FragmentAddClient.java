@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-public class FormClientFragment extends Fragment {
+public class FragmentAddClient extends Fragment {
 
 
 
