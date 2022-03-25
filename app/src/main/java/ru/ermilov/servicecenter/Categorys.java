@@ -11,6 +11,7 @@ public class Categorys {
     public Categorys(String category ){
 
         this.category = category;
+
     }
 
 }
