@@ -12,7 +12,7 @@ import android.view.View;
 public class MainActivity extends AppCompatActivity {
 
     private static FragmentManager fm;
-    private CardView buttonOpenClients;
+    private CardView buttonOpenClients,buttonOpenOrder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
         fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.add_client);
+
         if(fragment == null){
 
             fragment = new FragmentClients();
@@ -38,12 +39,23 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Fragment fragment = fm.findFragmentById(R.id.add_client);
-                fragment = new FragmentClients();
+                Fragment fragment = new FragmentClients();
                 fm.beginTransaction().replace(R.id.add_client,fragment).commit();
 
             }
         });
+
+       buttonOpenOrder = (CardView) findViewById(R.id.remont_CardView);
+        buttonOpenOrder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Fragment fragment = new Fragment_add_order();
+                fm.beginTransaction().replace(R.id.add_client,fragment).commit();
+            }
+        });
+
+
 
 
     }

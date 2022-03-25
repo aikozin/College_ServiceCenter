@@ -17,4 +17,11 @@
     <string name="nameClient">Введите Ф.И.О</string>
     <string name="e_mail">Введите E_mail</string>
     <string name="phone">Введите номер телефона</string>
+    <string name="Remont">Ремонт</string>
+    <string name="AddOrder">Добавить заказ</string>
+    <string name="NewOrder">Новый заказ</string>
+    <string name="discription_problem">Описание проблемы</string>
+    <string name="DateStart">Дата начала ремонта</string>
+    <string name="DateEnd">Дата окончания ремонта</string>
+    <string name="description_condition">Описание состояния</string>
 </resources>
