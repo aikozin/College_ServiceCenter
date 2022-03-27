@@ -39,8 +39,6 @@ public class FragmentClients extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
     }
 
     @Override
@@ -70,9 +68,6 @@ public class FragmentClients extends Fragment {
                 listViewClients.setAdapter(new AdapterClients(getContext()));
             }
         });
-
-
-
 
         return view;
     }
@@ -112,8 +107,6 @@ public class FragmentClients extends Fragment {
             tvFio.setText(mClientsList.get(i).fio);
             tvPhone.setText(mClientsList.get(i).phone);
             tvEmail.setText(mClientsList.get(i).email);
-
-
 
             return view;
         }
