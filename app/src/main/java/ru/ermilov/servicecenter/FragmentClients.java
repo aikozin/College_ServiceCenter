@@ -15,8 +15,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -32,8 +35,12 @@ import java.util.List;
 
 public class FragmentClients extends Fragment {
 
+    private DatabaseReference db;
     private CardView buttonAddClient;
+    private EditText searchListViev;
+    Clients clients;
     List<Clients> mClientsList = new ArrayList<>();
+    private ArrayList <Clients> mClient = new ArrayList<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,7 +63,7 @@ public class FragmentClients extends Fragment {
         });
 
         ListView listViewClients = view.findViewById(R.id.listViewClients);
-        DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+         db = FirebaseDatabase.getInstance().getReference();
         db.child("Clients").get().addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
                 Log.e("firebase", "Error getting data", task.getException());
@@ -68,6 +75,7 @@ public class FragmentClients extends Fragment {
                 listViewClients.setAdapter(new AdapterClients(getContext()));
             }
         });
+
 
         return view;
     }
@@ -112,7 +120,9 @@ public class FragmentClients extends Fragment {
         }
     }
 
-    private static  class DeleteHolder extends RecyclerView.ViewHolder{
+
+
+    /*private static  class DeleteHolder extends RecyclerView.ViewHolder{
 
         TextView tvFio, tvPhone, tvEmail;
         Button delete;
@@ -125,7 +135,7 @@ public class FragmentClients extends Fragment {
              tvEmail = view.findViewById(R.id.tvEmail);
              delete = view.findViewById(R.id.delete);
         }
-    }
+    }*/
 
 
 }

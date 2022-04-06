@@ -11,6 +11,12 @@
         <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/drawable/background_activity_login.xml" value="0.1535" />
         <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/activity_login.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/activity_main.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/fragment_add_client.xml" value="0.17708333333333334" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/fragment_add_order.xml" value="0.12360688956433637" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/fragment_form_client.xml" value="0.176" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/fragment_form_order.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/item_client.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/item_order.xml" value="0.14719202898550723" />
       </map>
     </option>
   </component>

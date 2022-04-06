@@ -1,32 +1,59 @@
 package ru.ermilov.servicecenter;
 
+import static android.app.Activity.RESULT_OK;
+
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 public class FragmentFormOrder extends Fragment {
 
+    private ImageView fotoClient;
+    private CardView buttonFoto;
+    private StorageReference mStorageRef;
+    private Uri uploadUri;
+
+    FirebaseStorage storage;
+    StorageReference storageReference;
 
     List<String> categories = new ArrayList<>();
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,6 +66,28 @@ public class FragmentFormOrder extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_form_order, container, false);
+
+        mStorageRef = FirebaseStorage.getInstance().getReference("ImageDB");
+        fotoClient = view.findViewById(R.id.fotoClient);
+        buttonFoto = view.findViewById(R.id.buttonFoto);
+
+        buttonFoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                try{
+                    startActivityForResult(takePhotoIntent, 1);
+                }catch (ActivityNotFoundException e){
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
+        StorageReference ref = storageReference.child("images/" + UUID.randomUUID().toString());
+
 
         Spinner categoryList = view.findViewById(R.id.spinnerСategory);
         //получение категорий из БД
@@ -57,7 +106,7 @@ public class FragmentFormOrder extends Fragment {
                 categoryList.setAdapter(adapter);
             }
         });
-
+    
         EditText etDiscriptionСondition = view.findViewById(R.id.etDiscriptionСondition);
         EditText etDiscriptionProblem = view.findViewById(R.id.etDiscriptionProblem);
         EditText etDateStart = view.findViewById(R.id.etDateStart);
@@ -67,16 +116,19 @@ public class FragmentFormOrder extends Fragment {
         btnCreateOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 String Category = categoryList.getSelectedItem().toString();
                 String DiscriptionСondition = etDiscriptionСondition.getText().toString();
                 String DiscriptionProblem = etDiscriptionProblem.getText().toString();
                 String DateStart = etDateStart.getText().toString();
                 String DateEnd = etDateEnd.getText().toString();
 
-                Orders order = new Orders(Category, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd);
+                Orders order = new Orders( Category, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd);
 
                 DatabaseReference db = FirebaseDatabase.getInstance().getReference();
                 db.child("Orders").push().setValue(order);
+
+                uploadImage();
             }
         });
 
@@ -93,4 +145,42 @@ public class FragmentFormOrder extends Fragment {
 
         return view;
     }
+
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            // Фотка сделана, извлекаем миниатюру картинки
+            Bundle extras = data.getExtras();
+            Bitmap thumbnailBitmap = (Bitmap) extras.get("data");
+            fotoClient.setImageBitmap(thumbnailBitmap);
+
+        }
+    }
+
+    private void uploadImage(){
+        Bitmap bitmap = ((BitmapDrawable) fotoClient.getDrawable()).getBitmap();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);
+        byte[] byteArray = baos.toByteArray();
+        final StorageReference mRef = mStorageRef.child(System.currentTimeMillis() + "my_image");
+        UploadTask up = mRef.putBytes(byteArray);
+        Task<Uri> task = up.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            @Override
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                return mRef.getDownloadUrl();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                uploadUri = task.getResult();
+            }
+        });
+    }
+
+
+
 }

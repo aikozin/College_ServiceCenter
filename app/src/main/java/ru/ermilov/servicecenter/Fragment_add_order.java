@@ -1,17 +1,23 @@
 package ru.ermilov.servicecenter;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -41,6 +47,8 @@ public class Fragment_add_order extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
        View view = inflater.inflate(R.layout.fragment_add_order, container, false);
+
+
 
        buttonAddOrder = (CardView) view.findViewById(R.id.addOrder);
        buttonAddOrder.setOnClickListener(new View.OnClickListener() {
@@ -79,6 +87,8 @@ public class Fragment_add_order extends Fragment {
 
     }
 
+
+
     class AdapterOrders extends BaseAdapter{
 
         private LayoutInflater mLayoutInflater;
@@ -109,13 +119,15 @@ public class Fragment_add_order extends Fragment {
             if (view == null)
                 view = mLayoutInflater.inflate(R.layout.item_order, null);
 
-          // TextView tvCategory = view.findViewById(R.id.tvCategory);// Категория
+            ImageView fotoClient = view.findViewById(R.id.fotoClient);
+           TextView tvCategory = view.findViewById(R.id.tvCategory);
             TextView tvCondition = view.findViewById(R.id.tvCondition);
             TextView tvProblema = view.findViewById(R.id.tvProblema);
             TextView tvDateStart = view.findViewById(R.id.tvDateStart);
             TextView tvDateEnd = view.findViewById(R.id.tvDateEnd);
 
-          //  tvCategory.setText(mOrdersList.get(i).category); // Категория
+
+           tvCategory.setText(mOrdersList.get(i).Category);
             tvCondition.setText(mOrdersList.get(i).Condition);
             tvProblema.setText(mOrdersList.get(i).Problema);
             tvDateStart.setText(mOrdersList.get(i).DateStart);
