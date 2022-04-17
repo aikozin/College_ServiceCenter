@@ -116,19 +116,13 @@ public class FragmentFormOrder extends Fragment {
         btnCreateOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 String Category = categoryList.getSelectedItem().toString();
                 String DiscriptionСondition = etDiscriptionСondition.getText().toString();
                 String DiscriptionProblem = etDiscriptionProblem.getText().toString();
                 String DateStart = etDateStart.getText().toString();
                 String DateEnd = etDateEnd.getText().toString();
 
-                Orders order = new Orders( Category, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd);
-
-                DatabaseReference db = FirebaseDatabase.getInstance().getReference();
-                db.child("Orders").push().setValue(order);
-
-                uploadImage();
+                uploadImage(Category, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd);
             }
         });
 
@@ -161,7 +155,8 @@ public class FragmentFormOrder extends Fragment {
         }
     }
 
-    private void uploadImage(){
+    private void uploadImage(String Category, String DiscriptionСondition, String DiscriptionProblem,
+                             String DateStart, String DateEnd) {
         Bitmap bitmap = ((BitmapDrawable) fotoClient.getDrawable()).getBitmap();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);
@@ -177,6 +172,11 @@ public class FragmentFormOrder extends Fragment {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
                 uploadUri = task.getResult();
+
+                Orders order = new Orders(Category, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd, uploadUri.toString());
+
+                DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+                db.child("Orders").push().setValue(order);
             }
         });
     }
