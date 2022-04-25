@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -46,15 +47,19 @@ public class FragmentAddClient extends Fragment {
             String fio = etFio.getText().toString();
             String phone = etPhone.getText().toString();
             String email = etEmail.getText().toString();
+            if (fio.equals("") || phone.equals("") || email.equals("")) {
+                Toast.makeText(container.getContext(), "Не все данные заполнены", Toast.LENGTH_LONG).show();
+            } else {
 
-            Clients client = new Clients(fio, phone, email);
+                Clients client = new Clients(fio, phone, email);
 
-            DatabaseReference db = FirebaseDatabase.getInstance().getReference();
-            db.child("Clients").push().setValue(client);
+                DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+                db.child("Clients").push().setValue(client);
 
+                Toast.makeText(btnCreateClient.getContext(), "Клиент добавлен", Toast.LENGTH_SHORT).show();
 
-
-
+                clickBack();
+            }
         });
 
 
@@ -62,14 +67,18 @@ public class FragmentAddClient extends Fragment {
         btnNazad.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentClients fragmentClients = new FragmentClients();
-                FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-                ft.replace(R.id.add_client, fragmentClients);
-                ft.commit();
+                clickBack();
             }
         });
 
 
         return view;
+    }
+
+    private void clickBack() {
+        FragmentClients fragmentClients = new FragmentClients();
+        FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+        ft.replace(R.id.add_client, fragmentClients);
+        ft.commit();
     }
 }

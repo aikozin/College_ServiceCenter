@@ -4,8 +4,10 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
@@ -20,10 +22,14 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +38,7 @@ import java.util.List;
 public class Fragment_add_order extends Fragment {
 
     private CardView buttonAddOrder;
+    private DatabaseReference db;
     List<Orders> mOrdersList = new ArrayList<>();
 
 
@@ -64,7 +71,7 @@ public class Fragment_add_order extends Fragment {
        });
 
         ListView listViewOrders = view.findViewById(R.id.listViewOrders);
-        DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+         db = FirebaseDatabase.getInstance().getReference();
         db.child("Orders").get().addOnCompleteListener(task -> {
 
             if (!task.isSuccessful()) {
@@ -73,10 +80,8 @@ public class Fragment_add_order extends Fragment {
             else {
                 for (DataSnapshot ds : task.getResult().getChildren()) {
                     mOrdersList.add(ds.getValue(Orders.class));
-
-
                 }
-                listViewOrders.setAdapter(new AdapterOrders(getContext()));
+                listViewOrders.setAdapter(new AdapterOrders(container.getContext()));
             }
 
         } );
@@ -119,19 +124,40 @@ public class Fragment_add_order extends Fragment {
             if (view == null)
                 view = mLayoutInflater.inflate(R.layout.item_order, null);
 
-            ImageView fotoClient = view.findViewById(R.id.fotoClient);
-           TextView tvCategory = view.findViewById(R.id.tvCategory);
+            ImageView ivFoto = view.findViewById(R.id.ivFoto);
+            TextView tvCategory = view.findViewById(R.id.tvCategory);
             TextView tvCondition = view.findViewById(R.id.tvCondition);
             TextView tvProblema = view.findViewById(R.id.tvProblema);
             TextView tvDateStart = view.findViewById(R.id.tvDateStart);
             TextView tvDateEnd = view.findViewById(R.id.tvDateEnd);
 
+            Picasso.get().load(mOrdersList.get(i).ImageUri).into(ivFoto);
+
 
            tvCategory.setText(mOrdersList.get(i).Category);
             tvCondition.setText(mOrdersList.get(i).Condition);
             tvProblema.setText(mOrdersList.get(i).Problema);
-            tvDateStart.setText(mOrdersList.get(i).DateStart);
+            tvDateStart.setText(mOrdersList.get(i).DateStart + "/");
             tvDateEnd.setText(mOrdersList.get(i).DateEnd);
+
+            CardView delete = view.findViewById(R.id.delete);
+            delete.setOnClickListener(v -> {
+                String imageUri = mOrdersList.get(i).ImageUri;
+                db.child("Orders").orderByChild("ImageUri").equalTo(imageUri).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot item: snapshot.getChildren())
+                            item.getRef().removeValue();
+
+                        Toast.makeText(delete.getContext(), "Заказ удален", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            });
 
 
             return view;

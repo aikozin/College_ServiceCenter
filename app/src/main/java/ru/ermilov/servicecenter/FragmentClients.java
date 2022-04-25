@@ -11,6 +11,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.provider.ContactsContract;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,12 +25,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,8 +69,35 @@ public class FragmentClients extends Fragment {
             ft.commit();
         });
 
+        /*DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+
+        Query query = ref.child("Clients");
+
+        
+        Button delete = view.findViewById(R.id.delete);
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot appleSnapshot: dataSnapshot.getChildren())
+                        {
+                            appleSnapshot.getRef().removeValue();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+        });*/
+
         ListView listViewClients = view.findViewById(R.id.listViewClients);
-         db = FirebaseDatabase.getInstance().getReference();
+        db = FirebaseDatabase.getInstance().getReference();
         db.child("Clients").get().addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
                 Log.e("firebase", "Error getting data", task.getException());
@@ -72,10 +106,9 @@ public class FragmentClients extends Fragment {
                 for (DataSnapshot ds : task.getResult().getChildren()) {
                     mClientsList.add(ds.getValue(Clients.class));
                 }
-                listViewClients.setAdapter(new AdapterClients(getContext()));
+                listViewClients.setAdapter(new AdapterClients(container.getContext()));
             }
         });
-
 
         return view;
     }
@@ -111,11 +144,34 @@ public class FragmentClients extends Fragment {
             TextView tvFio = view.findViewById(R.id.tvFio);
             TextView tvPhone = view.findViewById(R.id.tvPhone);
             TextView tvEmail = view.findViewById(R.id.tvEmail);
+            CardView delete = view.findViewById(R.id.delete);
+            EditText search = view.findViewById(R.id.searchListViev);
             
             tvFio.setText(mClientsList.get(i).fio);
             tvPhone.setText(mClientsList.get(i).phone);
             tvEmail.setText(mClientsList.get(i).email);
 
+            delete.setOnClickListener(v -> {
+                String phone = mClientsList.get(i).phone;
+                db.child("Clients").orderByChild("phone").equalTo(phone).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot item: snapshot.getChildren())
+                            item.getRef().removeValue();
+
+                        Toast.makeText(delete.getContext(), "Клиент удален", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            });
+
+
+
+            //db.child("Clients").orderByChild("fio").startAt(fio);
             return view;
         }
     }

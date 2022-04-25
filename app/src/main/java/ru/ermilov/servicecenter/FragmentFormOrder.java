@@ -5,6 +5,7 @@ import static android.app.Activity.RESULT_OK;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
@@ -53,11 +55,21 @@ public class FragmentFormOrder extends Fragment {
     StorageReference storageReference;
 
     List<String> categories = new ArrayList<>();
+    List<String> categoriesSearch = new ArrayList<>();
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+//        for (String item: categories) {
+//            if (item.equals("Комп"))
+//                categoriesSearch.add(item);
+//        }
+//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
+//                android.R.layout.simple_spinner_item, categoriesSearch);
+//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        categoryList.setAdapter(adapter);
 
     }
 
@@ -100,12 +112,26 @@ public class FragmentFormOrder extends Fragment {
                 for (DataSnapshot ds : task.getResult().getChildren()) {
                     categories.add(ds.getValue(Categories.class).name);
                 }
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(container.getContext(),
                         android.R.layout.simple_spinner_item, categories);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 categoryList.setAdapter(adapter);
             }
         });
+
+//        DatabaseReference db2 = FirebaseDatabase.getInstance().getReference();
+//        db2.child("Client").get().addOnCompleteListener(task -> {
+//            if (!task.isSuccessful()) {
+//                Log.e("firebase", "Error getting data", task.getException());
+//            }
+//            else {
+//                for (DataSnapshot ds : task.getResult().getChildren()) {
+//                    Clients client = ds.getValue(Clients.class);
+//                    if (client.fio.equals("Иванов Иван Иванович"))
+//                        ds.getRef().removeValue();
+//                }
+//            }
+//        });
     
         EditText etDiscriptionСondition = view.findViewById(R.id.etDiscriptionСondition);
         EditText etDiscriptionProblem = view.findViewById(R.id.etDiscriptionProblem);
@@ -123,7 +149,15 @@ public class FragmentFormOrder extends Fragment {
                 String DateEnd = etDateEnd.getText().toString();
 
                 uploadImage(Category, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd);
+
+                Toast.makeText(btnCreateOrder.getContext(), "Заказ добавлен", Toast.LENGTH_SHORT).show();
+
+                Fragment_add_order fragment_add_order = new Fragment_add_order();
+                FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+                ft.replace(R.id.add_client, fragment_add_order);
+                ft.commit();
             }
+
         });
 
         CardView btnNazad = view.findViewById(R.id.button_nazad);
@@ -141,7 +175,6 @@ public class FragmentFormOrder extends Fragment {
     }
 
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -157,7 +190,12 @@ public class FragmentFormOrder extends Fragment {
 
     private void uploadImage(String Category, String DiscriptionСondition, String DiscriptionProblem,
                              String DateStart, String DateEnd) {
-        Bitmap bitmap = ((BitmapDrawable) fotoClient.getDrawable()).getBitmap();
+        Bitmap bitmap;
+        if (fotoClient.getDrawable() == null) {
+            bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+        } else {
+            bitmap = ((BitmapDrawable) fotoClient.getDrawable()).getBitmap();
+        }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);
         byte[] byteArray = baos.toByteArray();
