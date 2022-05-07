@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseException;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -46,7 +47,8 @@ public class FragmentClients extends Fragment {
     private CardView buttonAddClient;
     private EditText searchListViev;
     Clients clients;
-    List<Clients> mClientsList = new ArrayList<>();
+    List<Clients> allClientsList = new ArrayList<>();
+    List<Clients> filterClientsList = new ArrayList<>();
     private ArrayList <Clients> mClient = new ArrayList<>();
 
     @Override
@@ -98,15 +100,51 @@ public class FragmentClients extends Fragment {
 
         ListView listViewClients = view.findViewById(R.id.listViewClients);
         db = FirebaseDatabase.getInstance().getReference();
-        db.child("Clients").get().addOnCompleteListener(task -> {
-            if (!task.isSuccessful()) {
-                Log.e("firebase", "Error getting data", task.getException());
+        try {
+            db.child("Clients").get().addOnCompleteListener(task -> {
+                if (!task.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", task.getException());
+                } else {
+                    for (DataSnapshot ds : task.getResult().getChildren()) {
+                        Clients clients = ds.getValue(Clients.class);
+                        clients.key = ds.getKey();
+                        allClientsList.add(clients);
+                    }
+                    filterClientsList = allClientsList;
+                    listViewClients.setAdapter(new AdapterClients(container.getContext()));
+                }
+            });
+        } catch (Exception e) {
+            Toast.makeText(container.getContext(), "Произошла ошибка при получении данных", Toast.LENGTH_SHORT).show();
+        }
+
+       /* listViewClients.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
             }
-            else {
-                for (DataSnapshot ds : task.getResult().getChildren()) {
-                    mClientsList.add(ds.getValue(Clients.class));
+        });*/
+
+        EditText search = view.findViewById(R.id.searchListViev);
+        search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterClientsList = new ArrayList<>();
+                for (Clients client : allClientsList) {
+                    if (client.fio.contains(s))
+                        filterClientsList.add(client);
                 }
                 listViewClients.setAdapter(new AdapterClients(container.getContext()));
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
             }
         });
 
@@ -115,6 +153,7 @@ public class FragmentClients extends Fragment {
 
     class AdapterClients extends BaseAdapter {
         private LayoutInflater mLayoutInflater;
+
         public AdapterClients(Context context) {
             super();
 
@@ -123,7 +162,7 @@ public class FragmentClients extends Fragment {
 
         @Override
         public int getCount() {
-            return mClientsList.size();
+            return filterClientsList.size();
         }
 
         @Override
@@ -145,14 +184,28 @@ public class FragmentClients extends Fragment {
             TextView tvPhone = view.findViewById(R.id.tvPhone);
             TextView tvEmail = view.findViewById(R.id.tvEmail);
             CardView delete = view.findViewById(R.id.delete);
-            EditText search = view.findViewById(R.id.searchListViev);
+            CardView order = view.findViewById(R.id.order);
             
-            tvFio.setText(mClientsList.get(i).fio);
-            tvPhone.setText(mClientsList.get(i).phone);
-            tvEmail.setText(mClientsList.get(i).email);
+            tvFio.setText(filterClientsList.get(i).fio);
+            tvPhone.setText(filterClientsList.get(i).phone);
+            tvEmail.setText(filterClientsList.get(i).email);
 
+            order.setOnClickListener(v -> {
+                Fragment fragment = new FragmentFormOrder();
+
+                Bundle bundle = new Bundle();
+                bundle.putString("fio", filterClientsList.get(i).fio);
+
+              //  Bundle bundleFio = new Bundle();
+               // bundleFio.putString("fio", filterClientsList.get(i).fio);
+
+                fragment.setArguments(bundle);
+               // fragment.setArguments(bundleFio);
+                getParentFragmentManager().beginTransaction().replace(R.id.add_client, fragment).commit();
+            });
+            
             delete.setOnClickListener(v -> {
-                String phone = mClientsList.get(i).phone;
+                String phone = filterClientsList.get(i).phone;
                 db.child("Clients").orderByChild("phone").equalTo(phone).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -169,9 +222,6 @@ public class FragmentClients extends Fragment {
                 });
             });
 
-
-
-            //db.child("Clients").orderByChild("fio").startAt(fio);
             return view;
         }
     }

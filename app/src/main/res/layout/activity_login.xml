@@ -59,6 +59,7 @@
 
                 <EditText
                     android:id="@+id/et_login"
+                    android:text="a"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -111,6 +112,7 @@
 
                 <EditText
                     android:id="@+id/et_password"
+                    android:text="a"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"

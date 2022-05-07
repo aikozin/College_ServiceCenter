@@ -39,6 +39,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -78,6 +79,17 @@ public class FragmentFormOrder extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_form_order, container, false);
+
+        TextView fioClient = view.findViewById(R.id.fioClientOrder);
+
+        Bundle bundle = getArguments();
+        String fio = bundle.getString("fio");
+
+        fioClient.setText(""+fio);
+
+
+      //  Bundle bundleFio = getArguments();
+       // String fio = bundleFio.getString("fio");
 
         mStorageRef = FirebaseStorage.getInstance().getReference("ImageDB");
         fotoClient = view.findViewById(R.id.fotoClient);
@@ -142,13 +154,16 @@ public class FragmentFormOrder extends Fragment {
         btnCreateOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+              //  Bundle bundle = getArguments();
+                String Fio = bundle.getString("fio");
+
                 String Category = categoryList.getSelectedItem().toString();
                 String DiscriptionСondition = etDiscriptionСondition.getText().toString();
                 String DiscriptionProblem = etDiscriptionProblem.getText().toString();
                 String DateStart = etDateStart.getText().toString();
                 String DateEnd = etDateEnd.getText().toString();
 
-                uploadImage(Category, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd);
+                uploadImage(Fio,Category, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd);
 
                 Toast.makeText(btnCreateOrder.getContext(), "Заказ добавлен", Toast.LENGTH_SHORT).show();
 
@@ -164,9 +179,9 @@ public class FragmentFormOrder extends Fragment {
         btnNazad.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment_add_order fragment_add_order = new Fragment_add_order();
+                FragmentClients fragmentClients = new FragmentClients();
                 FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-                ft.replace(R.id.add_client, fragment_add_order);
+                ft.replace(R.id.add_client, fragmentClients);
                 ft.commit();
             }
         });
@@ -188,7 +203,7 @@ public class FragmentFormOrder extends Fragment {
         }
     }
 
-    private void uploadImage(String Category, String DiscriptionСondition, String DiscriptionProblem,
+    private void uploadImage(String Key, String Category, String DiscriptionСondition, String DiscriptionProblem,
                              String DateStart, String DateEnd) {
         Bitmap bitmap;
         if (fotoClient.getDrawable() == null) {
@@ -211,14 +226,12 @@ public class FragmentFormOrder extends Fragment {
             public void onComplete(@NonNull Task<Uri> task) {
                 uploadUri = task.getResult();
 
-                Orders order = new Orders(Category, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd, uploadUri.toString());
+                Orders order = new Orders(Key,Category, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd, uploadUri.toString());
 
                 DatabaseReference db = FirebaseDatabase.getInstance().getReference();
                 db.child("Orders").push().setValue(order);
             }
         });
     }
-
-
 
 }

@@ -14,11 +14,14 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -39,7 +42,8 @@ public class Fragment_add_order extends Fragment {
 
     private CardView buttonAddOrder;
     private DatabaseReference db;
-    List<Orders> mOrdersList = new ArrayList<>();
+    List<Orders> allOrdersList = new ArrayList<>();
+    List<Orders> filterOrderList = new ArrayList<>();
 
 
 
@@ -57,18 +61,7 @@ public class Fragment_add_order extends Fragment {
 
 
 
-       buttonAddOrder = (CardView) view.findViewById(R.id.addOrder);
-       buttonAddOrder.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v) {
 
-               FragmentFormOrder fragmentFormOrder= new FragmentFormOrder();
-               FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-               ft.replace(R.id.add_client,fragmentFormOrder);
-               ft.commit();
-
-           }
-       });
 
         ListView listViewOrders = view.findViewById(R.id.listViewOrders);
          db = FirebaseDatabase.getInstance().getReference();
@@ -79,14 +72,39 @@ public class Fragment_add_order extends Fragment {
             }
             else {
                 for (DataSnapshot ds : task.getResult().getChildren()) {
-                    mOrdersList.add(ds.getValue(Orders.class));
+                    allOrdersList.add(ds.getValue(Orders.class));
                 }
+                filterOrderList = allOrdersList;
                 listViewOrders.setAdapter(new AdapterOrders(container.getContext()));
             }
 
         } );
 
+        EditText search = view.findViewById(R.id.search);
+        search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterOrderList = new ArrayList<>();
+                for (Orders order : allOrdersList){
+                    if (order.Fio.contains(s)){
+                        
+                        filterOrderList.add(order);
+                    }
+                }
+
+                listViewOrders.setAdapter(new AdapterOrders(container.getContext()));
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
         return view;
 
@@ -106,7 +124,7 @@ public class Fragment_add_order extends Fragment {
 
         @Override
         public int getCount() {
-            return mOrdersList.size();
+            return filterOrderList.size();
         }
 
         @Override
@@ -125,24 +143,26 @@ public class Fragment_add_order extends Fragment {
                 view = mLayoutInflater.inflate(R.layout.item_order, null);
 
             ImageView ivFoto = view.findViewById(R.id.ivFoto);
+            TextView tvFio = view.findViewById(R.id.tvFio);
+
             TextView tvCategory = view.findViewById(R.id.tvCategory);
             TextView tvCondition = view.findViewById(R.id.tvCondition);
             TextView tvProblema = view.findViewById(R.id.tvProblema);
             TextView tvDateStart = view.findViewById(R.id.tvDateStart);
             TextView tvDateEnd = view.findViewById(R.id.tvDateEnd);
 
-            Picasso.get().load(mOrdersList.get(i).ImageUri).into(ivFoto);
+            Picasso.get().load(filterOrderList.get(i).ImageUri).into(ivFoto);
 
-
-           tvCategory.setText(mOrdersList.get(i).Category);
-            tvCondition.setText(mOrdersList.get(i).Condition);
-            tvProblema.setText(mOrdersList.get(i).Problema);
-            tvDateStart.setText(mOrdersList.get(i).DateStart + "/");
-            tvDateEnd.setText(mOrdersList.get(i).DateEnd);
+            tvFio.setText(filterOrderList.get(i).Fio);
+            tvCategory.setText(filterOrderList.get(i).Category);
+            tvCondition.setText(filterOrderList.get(i).Condition);
+            tvProblema.setText(filterOrderList.get(i).Problema);
+            tvDateStart.setText(filterOrderList.get(i).DateStart + "/");
+            tvDateEnd.setText(filterOrderList.get(i).DateEnd);
 
             CardView delete = view.findViewById(R.id.delete);
             delete.setOnClickListener(v -> {
-                String imageUri = mOrdersList.get(i).ImageUri;
+                String imageUri = filterOrderList.get(i).ImageUri;
                 db.child("Orders").orderByChild("ImageUri").equalTo(imageUri).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
