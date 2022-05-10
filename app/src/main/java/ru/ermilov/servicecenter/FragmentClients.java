@@ -1,10 +1,12 @@
 package ru.ermilov.servicecenter;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -39,6 +41,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 public class FragmentClients extends Fragment {
@@ -136,7 +139,7 @@ public class FragmentClients extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 filterClientsList = new ArrayList<>();
                 for (Clients client : allClientsList) {
-                    if (client.fio.contains(s))
+                    if (client.fio.toLowerCase(Locale.ROOT).contains(s.toString().toLowerCase(Locale.ROOT)))
                         filterClientsList.add(client);
                 }
                 listViewClients.setAdapter(new AdapterClients(container.getContext()));
@@ -205,21 +208,37 @@ public class FragmentClients extends Fragment {
             });
             
             delete.setOnClickListener(v -> {
-                String phone = filterClientsList.get(i).phone;
-                db.child("Clients").orderByChild("phone").equalTo(phone).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for (DataSnapshot item: snapshot.getChildren())
-                            item.getRef().removeValue();
+                AlertDialog.Builder alert = new AlertDialog.Builder(delete.getContext());
+                alert.setTitle("Подтверждение");
+                alert.setMessage("Вы действительно хотите удалить клиента " + filterClientsList.get(i).fio + "?");
+                alert.setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                    String phone = filterClientsList.get(i).phone;
+                    db.child("Clients").orderByChild("phone").equalTo(phone).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            for (DataSnapshot item: snapshot.getChildren())
+                                item.getRef().removeValue();
 
-                        Toast.makeText(delete.getContext(), "Клиент удален", Toast.LENGTH_SHORT).show();
-                    }
+                            Toast.makeText(delete.getContext(), "Клиент удален", Toast.LENGTH_SHORT).show();
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                            FragmentClients fragmentClients = new FragmentClients();
+                            FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+                            ft.replace(R.id.add_client, fragmentClients);
+                            ft.commit();
+                        }
 
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                });
+                alert.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
                     }
                 });
+                alert.show();
             });
 
             return view;

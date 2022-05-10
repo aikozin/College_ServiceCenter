@@ -85,7 +85,7 @@ public class FragmentFormOrder extends Fragment {
         Bundle bundle = getArguments();
         String fio = bundle.getString("fio");
 
-        fioClient.setText(""+fio);
+        fioClient.setText("Создание нового заказа от клиента \n" + fio);
 
 
       //  Bundle bundleFio = getArguments();

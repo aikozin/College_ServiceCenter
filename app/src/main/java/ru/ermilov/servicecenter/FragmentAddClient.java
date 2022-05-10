@@ -63,13 +63,8 @@ public class FragmentAddClient extends Fragment {
         });
 
 
-      /*  CardView btnNazad = view.findViewById(R.id.button_nazad);
-        btnNazad.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                clickBack();
-            }
-        });*/
+        CardView btnNazad = view.findViewById(R.id.button_nazad);
+        btnNazad.setOnClickListener(v -> clickBack());
 
 
         return view;

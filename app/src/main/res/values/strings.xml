@@ -13,7 +13,7 @@
     <string name="addClient">Добавить клиента</string>
     <string name="new_client">Новый клиент</string>
     <string name="sozdat">Создать</string>
-    <string name="Profil">Профиль</string>
+    <string name="Profil">Профиль заказа</string>
     <string name="nameClient">Введите Ф.И.О</string>
     <string name="e_mail">Введите E_mail</string>
     <string name="phone">Введите номер телефона</string>

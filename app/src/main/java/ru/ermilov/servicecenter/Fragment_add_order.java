@@ -2,6 +2,7 @@ package ru.ermilov.servicecenter;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -162,21 +164,37 @@ public class Fragment_add_order extends Fragment {
 
             CardView delete = view.findViewById(R.id.delete);
             delete.setOnClickListener(v -> {
-                String imageUri = filterOrderList.get(i).ImageUri;
-                db.child("Orders").orderByChild("ImageUri").equalTo(imageUri).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for (DataSnapshot item: snapshot.getChildren())
-                            item.getRef().removeValue();
+                AlertDialog.Builder alert = new AlertDialog.Builder(delete.getContext());
+                alert.setTitle("Подтверждение");
+                alert.setMessage("Вы действительно хотите удалить данный заказ?");
+                alert.setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                    String imageUri = filterOrderList.get(i).ImageUri;
+                    db.child("Orders").orderByChild("ImageUri").equalTo(imageUri).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            for (DataSnapshot item: snapshot.getChildren())
+                                item.getRef().removeValue();
 
-                        Toast.makeText(delete.getContext(), "Заказ удален", Toast.LENGTH_SHORT).show();
-                    }
+                            Toast.makeText(delete.getContext(), "Заказ удален", Toast.LENGTH_SHORT).show();
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                            Fragment_add_order fragment_add_order = new Fragment_add_order();
+                            FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+                            ft.replace(R.id.add_client, fragment_add_order);
+                            ft.commit();
+                        }
 
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                });
+                alert.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
                     }
                 });
+                alert.show();
             });
 
 
