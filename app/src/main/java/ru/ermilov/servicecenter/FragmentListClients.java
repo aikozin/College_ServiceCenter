@@ -2,6 +2,8 @@ package ru.ermilov.servicecenter;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -9,11 +11,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.RecyclerView;
 
-import android.provider.ContactsContract;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -21,22 +20,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseException;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -44,7 +37,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class FragmentClients extends Fragment {
+public class FragmentListClients extends Fragment {
 
     private DatabaseReference db;
     private CardView buttonAddClient;
@@ -63,43 +56,18 @@ public class FragmentClients extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_add_client, container, false);
+        View view = inflater.inflate(R.layout.fragment_list_client, container, false);
 
         buttonAddClient = view.findViewById(R.id.addClient);
         buttonAddClient.setOnClickListener(v -> {
 
-            FragmentAddClient fragmentAddClient = new FragmentAddClient();
+            FragmentFormClient fragmentAddClient = new FragmentFormClient();
             FragmentTransaction ft = getParentFragmentManager().beginTransaction();
             ft.replace(R.id.add_client, fragmentAddClient);
             ft.commit();
         });
 
-        /*DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
 
-        Query query = ref.child("Clients");
-
-        
-        Button delete = view.findViewById(R.id.delete);
-        delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                query.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot appleSnapshot: dataSnapshot.getChildren())
-                        {
-                            appleSnapshot.getRef().removeValue();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-            }
-        });*/
 
         ListView listViewClients = view.findViewById(R.id.listViewClients);
         db = FirebaseDatabase.getInstance().getReference();
@@ -121,12 +89,12 @@ public class FragmentClients extends Fragment {
             Toast.makeText(container.getContext(), "Произошла ошибка при получении данных", Toast.LENGTH_SHORT).show();
         }
 
-       /* listViewClients.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listViewClients.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
             }
-        });*/
+        });
 
         EditText search = view.findViewById(R.id.searchListViev);
         search.addTextChangedListener(new TextWatcher() {
@@ -188,7 +156,8 @@ public class FragmentClients extends Fragment {
             TextView tvEmail = view.findViewById(R.id.tvEmail);
             CardView delete = view.findViewById(R.id.delete);
             CardView order = view.findViewById(R.id.order);
-            
+            CardView edit = view.findViewById(R.id.edit);
+
             tvFio.setText(filterClientsList.get(i).fio);
             tvPhone.setText(filterClientsList.get(i).phone);
             tvEmail.setText(filterClientsList.get(i).email);
@@ -197,16 +166,35 @@ public class FragmentClients extends Fragment {
                 Fragment fragment = new FragmentFormOrder();
 
                 Bundle bundle = new Bundle();
+                bundle.putString("key", filterClientsList.get(i).key);
                 bundle.putString("fio", filterClientsList.get(i).fio);
 
-              //  Bundle bundleFio = new Bundle();
-               // bundleFio.putString("fio", filterClientsList.get(i).fio);
+
 
                 fragment.setArguments(bundle);
-               // fragment.setArguments(bundleFio);
+
                 getParentFragmentManager().beginTransaction().replace(R.id.add_client, fragment).commit();
             });
-            
+
+            tvPhone.setOnClickListener(v -> {
+                String toDial="tel:"+tvPhone.getText().toString();
+                startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse(toDial)));
+            });
+
+            edit.setOnClickListener(v -> {
+                Fragment fragment = new FragmentFormClient();
+
+                    Bundle bundle = new Bundle();
+                    bundle.putString("key", filterClientsList.get(i).key);
+                    bundle.putString("fio", filterClientsList.get(i).fio);
+                    bundle.putString("email", filterClientsList.get(i).email);
+                    bundle.putString("phone", filterClientsList.get(i).phone);
+
+                fragment.setArguments(bundle);
+
+                getParentFragmentManager().beginTransaction().replace(R.id.add_client, fragment).commit();
+            });
+
             delete.setOnClickListener(v -> {
                 AlertDialog.Builder alert = new AlertDialog.Builder(delete.getContext());
                 alert.setTitle("Подтверждение");
@@ -221,7 +209,7 @@ public class FragmentClients extends Fragment {
 
                             Toast.makeText(delete.getContext(), "Клиент удален", Toast.LENGTH_SHORT).show();
 
-                            FragmentClients fragmentClients = new FragmentClients();
+                            FragmentListClients fragmentClients = new FragmentListClients();
                             FragmentTransaction ft = getParentFragmentManager().beginTransaction();
                             ft.replace(R.id.add_client, fragmentClients);
                             ft.commit();
@@ -244,23 +232,5 @@ public class FragmentClients extends Fragment {
             return view;
         }
     }
-
-
-
-    /*private static  class DeleteHolder extends RecyclerView.ViewHolder{
-
-        TextView tvFio, tvPhone, tvEmail;
-        Button delete;
-
-        public DeleteHolder(View view){
-            super(view);
-
-             tvFio = view.findViewById(R.id.tvFio);
-             tvPhone = view.findViewById(R.id.tvPhone);
-             tvEmail = view.findViewById(R.id.tvEmail);
-             delete = view.findViewById(R.id.delete);
-        }
-    }*/
-
 
 }

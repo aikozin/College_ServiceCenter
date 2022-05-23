@@ -5,7 +5,6 @@ import static android.app.Activity.RESULT_OK;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,6 +15,7 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.os.FileObserver;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,9 +37,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -63,14 +63,6 @@ public class FragmentFormOrder extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        for (String item: categories) {
-//            if (item.equals("Комп"))
-//                categoriesSearch.add(item);
-//        }
-//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
-//                android.R.layout.simple_spinner_item, categoriesSearch);
-//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        categoryList.setAdapter(adapter);
 
     }
 
@@ -84,12 +76,11 @@ public class FragmentFormOrder extends Fragment {
 
         Bundle bundle = getArguments();
         String fio = bundle.getString("fio");
-
+        String key = bundle.getString("key");
         fioClient.setText("Создание нового заказа от клиента \n" + fio);
 
 
-      //  Bundle bundleFio = getArguments();
-       // String fio = bundleFio.getString("fio");
+
 
         mStorageRef = FirebaseStorage.getInstance().getReference("ImageDB");
         fotoClient = view.findViewById(R.id.fotoClient);
@@ -131,55 +122,96 @@ public class FragmentFormOrder extends Fragment {
             }
         });
 
-//        DatabaseReference db2 = FirebaseDatabase.getInstance().getReference();
-//        db2.child("Client").get().addOnCompleteListener(task -> {
-//            if (!task.isSuccessful()) {
-//                Log.e("firebase", "Error getting data", task.getException());
-//            }
-//            else {
-//                for (DataSnapshot ds : task.getResult().getChildren()) {
-//                    Clients client = ds.getValue(Clients.class);
-//                    if (client.fio.equals("Иванов Иван Иванович"))
-//                        ds.getRef().removeValue();
-//                }
-//            }
-//        });
-    
+        TextView fioClientOrder = view.findViewById(R.id.fioClientOrder);
         EditText etDiscriptionСondition = view.findViewById(R.id.etDiscriptionСondition);
         EditText etDiscriptionProblem = view.findViewById(R.id.etDiscriptionProblem);
         EditText etDateStart = view.findViewById(R.id.etDateStart);
         EditText etDateEnd = view.findViewById(R.id.etDateEnd);
 
         CardView btnCreateOrder = view.findViewById(R.id.btnCreateOrder);
-        btnCreateOrder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              //  Bundle bundle = getArguments();
-                String Fio = bundle.getString("fio");
 
-                String Category = categoryList.getSelectedItem().toString();
-                String DiscriptionСondition = etDiscriptionСondition.getText().toString();
-                String DiscriptionProblem = etDiscriptionProblem.getText().toString();
-                String DateStart = etDateStart.getText().toString();
-                String DateEnd = etDateEnd.getText().toString();
+        Bundle bundleOrder = getArguments();
 
-                uploadImage(Fio,Category, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd);
+        if(!bundleOrder.getString("type", "").equals("edit")){
+            btnCreateOrder.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-                Toast.makeText(btnCreateOrder.getContext(), "Заказ добавлен", Toast.LENGTH_SHORT).show();
+                    String Fio = bundle.getString("fio");
+                    String Category = categoryList.getSelectedItem().toString();
+                    String DiscriptionСondition = etDiscriptionСondition.getText().toString();
+                    String DiscriptionProblem = etDiscriptionProblem.getText().toString();
+                    String DateStart = etDateStart.getText().toString();
+                    String DateEnd = etDateEnd.getText().toString();
 
-                Fragment_add_order fragment_add_order = new Fragment_add_order();
-                FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-                ft.replace(R.id.add_client, fragment_add_order);
-                ft.commit();
-            }
+                    uploadImage(Fio,Category, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd);
 
-        });
+                    Toast.makeText(btnCreateOrder.getContext(), "Заказ добавлен", Toast.LENGTH_SHORT).show();
+
+                    FragmentListOrder fragment_add_order = new FragmentListOrder();
+                    FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+                    ft.replace(R.id.add_client, fragment_add_order);
+                    ft.commit();
+                }
+
+            });
+
+        }else {
+
+           String key1 = bundleOrder.getString("key");
+            String FioBundle = bundleOrder.getString("Fio");
+            String CategoryBundle = bundleOrder.getString("Category");
+            String ConditionBundle = bundleOrder.getString("Condition");
+            String ProblemaBundle = bundleOrder.getString("Problema");
+            String DateStartBundle = bundleOrder.getString("DateStart");
+            String DateEndBundle = bundleOrder.getString("DateEnd");
+            String ImageUriBundle = bundleOrder.getString("ImageUri");
+
+            //categoryList.(CategoryBundle);
+            fioClientOrder.setText(FioBundle);
+            etDiscriptionСondition.setText(ConditionBundle);
+            etDiscriptionProblem.setText(ProblemaBundle);
+            etDateStart.setText(DateStartBundle);
+            etDateEnd.setText(DateEndBundle);
+            //etDateStart.setText(ImageUriBundle);
+            Picasso.get().load(ImageUriBundle).into(fotoClient);
+
+            TextView textSave = view.findViewById(R.id.textSave);
+
+            textSave.setText("Сохранить");
+           //fioClientOrder.setText("Редактировать заказ");
+
+            btnCreateOrder.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    String Fio = bundle.getString("fio");
+                    String Category = categoryList.getSelectedItem().toString();
+                    String DiscriptionСondition = etDiscriptionСondition.getText().toString();
+                    String DiscriptionProblem = etDiscriptionProblem.getText().toString();
+                    String DateStart = etDateStart.getText().toString();
+                    String DateEnd = etDateEnd.getText().toString();
+
+                    uploadImage(Fio,Category, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd);
+
+                    Toast.makeText(btnCreateOrder.getContext(), "Заказ изменен", Toast.LENGTH_SHORT).show();
+
+                    FragmentListOrder fragment_add_order = new FragmentListOrder();
+                    FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+                    ft.replace(R.id.add_client, fragment_add_order);
+                    ft.commit();
+                }
+
+            });
+        }
+
+
 
         CardView btnNazad = view.findViewById(R.id.button_nazad);
         btnNazad.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentClients fragmentClients = new FragmentClients();
+                FragmentListClients fragmentClients = new FragmentListClients();
                 FragmentTransaction ft = getParentFragmentManager().beginTransaction();
                 ft.replace(R.id.add_client, fragmentClients);
                 ft.commit();
@@ -195,7 +227,7 @@ public class FragmentFormOrder extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 1 && resultCode == RESULT_OK) {
-            // Фотка сделана, извлекаем миниатюру картинки
+
             Bundle extras = data.getExtras();
             Bitmap thumbnailBitmap = (Bitmap) extras.get("data");
             fotoClient.setImageBitmap(thumbnailBitmap);

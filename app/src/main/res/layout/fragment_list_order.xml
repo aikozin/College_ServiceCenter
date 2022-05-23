@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".Fragment_add_order">
+    tools:context=".FragmentListOrder">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/search_cardView"
@@ -61,9 +61,9 @@
     <ListView
         android:id="@+id/listViewOrders"
         android:layout_width="match_parent"
-        android:layout_height="648dp"
+        android:layout_height="match_parent"
         android:layout_marginTop="82dp"
-        android:layout_marginBottom="82dp" />
+        />
 
 
 

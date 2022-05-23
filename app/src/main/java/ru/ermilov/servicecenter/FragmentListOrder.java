@@ -1,21 +1,15 @@
 package ru.ermilov.servicecenter;
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -40,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Fragment_add_order extends Fragment {
+public class FragmentListOrder extends Fragment {
 
     private CardView buttonAddOrder;
     private DatabaseReference db;
@@ -58,8 +52,8 @@ public class Fragment_add_order extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-       View view = inflater.inflate(R.layout.fragment_add_order, container, false);
+
+       View view = inflater.inflate(R.layout.fragment_list_order, container, false);
 
 
 
@@ -75,6 +69,8 @@ public class Fragment_add_order extends Fragment {
             else {
                 for (DataSnapshot ds : task.getResult().getChildren()) {
                     allOrdersList.add(ds.getValue(Orders.class));
+                    Orders orders = ds.getValue(Orders.class);
+                    orders.key = ds.getKey();
                 }
                 filterOrderList = allOrdersList;
                 listViewOrders.setAdapter(new AdapterOrders(container.getContext()));
@@ -94,7 +90,7 @@ public class Fragment_add_order extends Fragment {
                 filterOrderList = new ArrayList<>();
                 for (Orders order : allOrdersList){
                     if (order.Fio.contains(s)){
-                        
+
                         filterOrderList.add(order);
                     }
                 }
@@ -162,6 +158,30 @@ public class Fragment_add_order extends Fragment {
             tvDateStart.setText(filterOrderList.get(i).DateStart + "/");
             tvDateEnd.setText(filterOrderList.get(i).DateEnd);
 
+            CardView edit = view.findViewById(R.id.edit);
+
+            edit.setOnClickListener(v -> {
+                Fragment fragment = new FragmentFormOrder();
+
+                Bundle bundleOrder = new Bundle();
+
+                bundleOrder.putString("key", filterOrderList.get(i).key);
+                bundleOrder.putString("type", "edit");
+                bundleOrder.putString("Category", filterOrderList.get(i).Category);
+                bundleOrder.putString("Fio", filterOrderList.get(i).Fio);
+                bundleOrder.putString("Condition", filterOrderList.get(i).Condition);
+                bundleOrder.putString("Problema", filterOrderList.get(i).Problema);
+                bundleOrder.putString("DateStart", filterOrderList.get(i).DateStart);
+                bundleOrder.putString("DateEnd", filterOrderList.get(i).DateEnd);
+                bundleOrder.putString("ImageUri", filterOrderList.get(i).ImageUri);
+
+
+
+                fragment.setArguments(bundleOrder);
+
+                getParentFragmentManager().beginTransaction().replace(R.id.add_client, fragment).commit();
+            });
+
             CardView delete = view.findViewById(R.id.delete);
             delete.setOnClickListener(v -> {
                 AlertDialog.Builder alert = new AlertDialog.Builder(delete.getContext());
@@ -177,7 +197,7 @@ public class Fragment_add_order extends Fragment {
 
                             Toast.makeText(delete.getContext(), "Заказ удален", Toast.LENGTH_SHORT).show();
 
-                            Fragment_add_order fragment_add_order = new Fragment_add_order();
+                            FragmentListOrder fragment_add_order = new FragmentListOrder();
                             FragmentTransaction ft = getParentFragmentManager().beginTransaction();
                             ft.replace(R.id.add_client, fragment_add_order);
                             ft.commit();
