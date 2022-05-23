@@ -56,7 +56,8 @@ public class FragmentFormOrder extends Fragment {
     StorageReference storageReference;
 
     List<String> categories = new ArrayList<>();
-    List<String> categoriesSearch = new ArrayList<>();
+    List<String> categoriesKey = new ArrayList<>();
+    String keyOrder = null;
 
 
     @Override
@@ -75,8 +76,8 @@ public class FragmentFormOrder extends Fragment {
         TextView fioClient = view.findViewById(R.id.fioClientOrder);
 
         Bundle bundle = getArguments();
-        String fio = bundle.getString("fio");
-        String key = bundle.getString("key");
+        keyOrder = bundle.getString("keyOrder");
+        String fio = bundle.getString("Fio");
         fioClient.setText("Создание нового заказа от клиента \n" + fio);
 
 
@@ -113,12 +114,20 @@ public class FragmentFormOrder extends Fragment {
             }
             else {
                 for (DataSnapshot ds : task.getResult().getChildren()) {
-                    categories.add(ds.getValue(Categories.class).name);
+                    Categories category = ds.getValue(Categories.class);
+                    category.key = ds.getKey();
+                    categories.add(category.name);
+                    categoriesKey.add(category.key);
                 }
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(container.getContext(),
                         android.R.layout.simple_spinner_item, categories);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 categoryList.setAdapter(adapter);
+                if (bundle.containsKey("Category")) {
+                    String categoryKey = bundle.getString("Category");
+                    int position = categoriesKey.indexOf(categoryKey);
+                    categoryList.setSelection(position);
+                }
             }
         });
 
@@ -130,21 +139,19 @@ public class FragmentFormOrder extends Fragment {
 
         CardView btnCreateOrder = view.findViewById(R.id.btnCreateOrder);
 
-        Bundle bundleOrder = getArguments();
-
-        if(!bundleOrder.getString("type", "").equals("edit")){
+        if(!bundle.getString("type", "").equals("edit")){
             btnCreateOrder.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-                    String Fio = bundle.getString("fio");
-                    String Category = categoryList.getSelectedItem().toString();
+                    String Fio = bundle.getString("Fio");
+                    String CategoryKey = categoriesKey.get(categoryList.getSelectedItemPosition());
                     String DiscriptionСondition = etDiscriptionСondition.getText().toString();
                     String DiscriptionProblem = etDiscriptionProblem.getText().toString();
                     String DateStart = etDateStart.getText().toString();
                     String DateEnd = etDateEnd.getText().toString();
 
-                    uploadImage(Fio,Category, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd);
+                    uploadData(Fio,CategoryKey, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd);
 
                     Toast.makeText(btnCreateOrder.getContext(), "Заказ добавлен", Toast.LENGTH_SHORT).show();
 
@@ -158,14 +165,14 @@ public class FragmentFormOrder extends Fragment {
 
         }else {
 
-           String key1 = bundleOrder.getString("key");
-            String FioBundle = bundleOrder.getString("Fio");
-            String CategoryBundle = bundleOrder.getString("Category");
-            String ConditionBundle = bundleOrder.getString("Condition");
-            String ProblemaBundle = bundleOrder.getString("Problema");
-            String DateStartBundle = bundleOrder.getString("DateStart");
-            String DateEndBundle = bundleOrder.getString("DateEnd");
-            String ImageUriBundle = bundleOrder.getString("ImageUri");
+           String key1 = bundle.getString("key");
+            String FioBundle = bundle.getString("Fio");
+            String CategoryKeyBundle = bundle.getString("Category");
+            String ConditionBundle = bundle.getString("Condition");
+            String ProblemaBundle = bundle.getString("Problema");
+            String DateStartBundle = bundle.getString("DateStart");
+            String DateEndBundle = bundle.getString("DateEnd");
+            String ImageUriBundle = bundle.getString("ImageUri");
 
             //categoryList.(CategoryBundle);
             fioClientOrder.setText(FioBundle);
@@ -185,14 +192,14 @@ public class FragmentFormOrder extends Fragment {
                 @Override
                 public void onClick(View v) {
 
-                    String Fio = bundle.getString("fio");
-                    String Category = categoryList.getSelectedItem().toString();
+                    String Fio = bundle.getString("Fio");
+                    String Category = categoriesKey.get(categoryList.getSelectedItemPosition());
                     String DiscriptionСondition = etDiscriptionСondition.getText().toString();
                     String DiscriptionProblem = etDiscriptionProblem.getText().toString();
                     String DateStart = etDateStart.getText().toString();
                     String DateEnd = etDateEnd.getText().toString();
 
-                    uploadImage(Fio,Category, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd);
+                    uploadData(Fio,Category, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd);
 
                     Toast.makeText(btnCreateOrder.getContext(), "Заказ изменен", Toast.LENGTH_SHORT).show();
 
@@ -235,7 +242,7 @@ public class FragmentFormOrder extends Fragment {
         }
     }
 
-    private void uploadImage(String Key, String Category, String DiscriptionСondition, String DiscriptionProblem,
+    private void uploadData(String Key, String CategoryKey, String DiscriptionСondition, String DiscriptionProblem,
                              String DateStart, String DateEnd) {
         Bitmap bitmap;
         if (fotoClient.getDrawable() == null) {
@@ -258,10 +265,14 @@ public class FragmentFormOrder extends Fragment {
             public void onComplete(@NonNull Task<Uri> task) {
                 uploadUri = task.getResult();
 
-                Orders order = new Orders(Key,Category, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd, uploadUri.toString());
+                Orders order = new Orders(Key,CategoryKey, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd, uploadUri.toString());
 
                 DatabaseReference db = FirebaseDatabase.getInstance().getReference();
-                db.child("Orders").push().setValue(order);
+                if (keyOrder == null) {
+                    db.child("Orders").push().setValue(order);
+                } else {
+                    db.child("Orders").child(keyOrder).setValue(order);
+                }
             }
         });
     }

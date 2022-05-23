@@ -1,17 +1,18 @@
 package ru.ermilov.servicecenter;
 
 public class Orders {
-    public String Fio, Category, Condition, Problema, DateStart, DateEnd, ImageUri;
-    public String key;
+    public String Fio, CategoryKey, Condition, Problema, DateStart, DateEnd, ImageUri;
+    public String keyOrder;
+    public String Category;
 
     public Orders(){
 
     }
 
-    public Orders( String Fio ,String Category, String Condition, String Problema, String DateStart, String DateEnd, String ImageUri){
+    public Orders( String Fio ,String CategoryKey, String Condition, String Problema, String DateStart, String DateEnd, String ImageUri){
 
         this.Fio = Fio;
-        this.Category = Category;
+        this.CategoryKey = CategoryKey;
         this.Condition = Condition;
         this.Problema = Problema;
         this.DateStart = DateStart;

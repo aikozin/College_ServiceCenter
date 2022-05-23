@@ -40,6 +40,7 @@ public class FragmentListOrder extends Fragment {
     private DatabaseReference db;
     List<Orders> allOrdersList = new ArrayList<>();
     List<Orders> filterOrderList = new ArrayList<>();
+    List<Categories> categories = new ArrayList<>();
 
 
 
@@ -55,12 +56,22 @@ public class FragmentListOrder extends Fragment {
 
        View view = inflater.inflate(R.layout.fragment_list_order, container, false);
 
+        db = FirebaseDatabase.getInstance().getReference();
 
-
-
+        db.child("Category").get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                Log.e("firebase", "Error getting data", task.getException());
+            }
+            else {
+                for (DataSnapshot ds : task.getResult().getChildren()) {
+                    Categories category = ds.getValue(Categories.class);
+                    category.key = ds.getKey();
+                    categories.add(category);
+                }
+            }
+        });
 
         ListView listViewOrders = view.findViewById(R.id.listViewOrders);
-         db = FirebaseDatabase.getInstance().getReference();
         db.child("Orders").get().addOnCompleteListener(task -> {
 
             if (!task.isSuccessful()) {
@@ -68,9 +79,14 @@ public class FragmentListOrder extends Fragment {
             }
             else {
                 for (DataSnapshot ds : task.getResult().getChildren()) {
-                    allOrdersList.add(ds.getValue(Orders.class));
                     Orders orders = ds.getValue(Orders.class);
-                    orders.key = ds.getKey();
+                    String categoryName = "";
+                    for (Categories item : categories)
+                        if (item.key.equals(orders.CategoryKey))
+                            categoryName = item.name;
+                    orders.Category = categoryName;
+                    orders.keyOrder = ds.getKey();
+                    allOrdersList.add(orders);
                 }
                 filterOrderList = allOrdersList;
                 listViewOrders.setAdapter(new AdapterOrders(container.getContext()));
@@ -90,7 +106,6 @@ public class FragmentListOrder extends Fragment {
                 filterOrderList = new ArrayList<>();
                 for (Orders order : allOrdersList){
                     if (order.Fio.contains(s)){
-
                         filterOrderList.add(order);
                     }
                 }
@@ -165,9 +180,9 @@ public class FragmentListOrder extends Fragment {
 
                 Bundle bundleOrder = new Bundle();
 
-                bundleOrder.putString("key", filterOrderList.get(i).key);
+                bundleOrder.putString("keyOrder", filterOrderList.get(i).keyOrder);
                 bundleOrder.putString("type", "edit");
-                bundleOrder.putString("Category", filterOrderList.get(i).Category);
+                bundleOrder.putString("Category", filterOrderList.get(i).CategoryKey);
                 bundleOrder.putString("Fio", filterOrderList.get(i).Fio);
                 bundleOrder.putString("Condition", filterOrderList.get(i).Condition);
                 bundleOrder.putString("Problema", filterOrderList.get(i).Problema);
