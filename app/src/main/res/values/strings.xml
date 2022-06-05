@@ -25,4 +25,7 @@
     <string name="DateEnd">Дата окончания ремонта</string>
     <string name="description_condition">Описание состояния</string>
     <string name="ProfilOrder">Профиль заказа</string>
+    <string name="titleStatys1">Ожидает ремонта</string>
+    <string name="titleStatys2">Ремонтируется</string>
+    <string name="titleStatys3">Ремонт завершен</string>
 </resources>

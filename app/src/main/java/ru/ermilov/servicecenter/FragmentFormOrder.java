@@ -40,7 +40,9 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -77,11 +79,12 @@ public class FragmentFormOrder extends Fragment {
 
         Bundle bundle = getArguments();
         keyOrder = bundle.getString("keyOrder");
-        String fio = bundle.getString("Fio");
+        String fio = bundle.getString("fio");
         fioClient.setText("Создание нового заказа от клиента \n" + fio);
 
-
-
+        Date date = new Date(System.currentTimeMillis());
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        String time = sdf.format(date);
 
         mStorageRef = FirebaseStorage.getInstance().getReference("ImageDB");
         fotoClient = view.findViewById(R.id.fotoClient);
@@ -137,6 +140,8 @@ public class FragmentFormOrder extends Fragment {
         EditText etDateStart = view.findViewById(R.id.etDateStart);
         EditText etDateEnd = view.findViewById(R.id.etDateEnd);
 
+        etDateStart.setText(time);
+
         CardView btnCreateOrder = view.findViewById(R.id.btnCreateOrder);
 
         if(!bundle.getString("type", "").equals("edit")){
@@ -144,7 +149,7 @@ public class FragmentFormOrder extends Fragment {
                 @Override
                 public void onClick(View v) {
 
-                    String Fio = bundle.getString("Fio");
+                    String Fio = bundle.getString("fio");
                     String CategoryKey = categoriesKey.get(categoryList.getSelectedItemPosition());
                     String DiscriptionСondition = etDiscriptionСondition.getText().toString();
                     String DiscriptionProblem = etDiscriptionProblem.getText().toString();
@@ -153,12 +158,7 @@ public class FragmentFormOrder extends Fragment {
 
                     uploadData(Fio,CategoryKey, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd);
 
-                    Toast.makeText(btnCreateOrder.getContext(), "Заказ добавлен", Toast.LENGTH_SHORT).show();
-
-                    FragmentListOrder fragment_add_order = new FragmentListOrder();
-                    FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-                    ft.replace(R.id.add_client, fragment_add_order);
-                    ft.commit();
+                    Toast.makeText(btnCreateOrder.getContext(), "Заказ сохраняется", Toast.LENGTH_SHORT).show();
                 }
 
             });
@@ -174,19 +174,18 @@ public class FragmentFormOrder extends Fragment {
             String DateEndBundle = bundle.getString("DateEnd");
             String ImageUriBundle = bundle.getString("ImageUri");
 
-            //categoryList.(CategoryBundle);
+
             fioClientOrder.setText(FioBundle);
             etDiscriptionСondition.setText(ConditionBundle);
             etDiscriptionProblem.setText(ProblemaBundle);
             etDateStart.setText(DateStartBundle);
             etDateEnd.setText(DateEndBundle);
-            //etDateStart.setText(ImageUriBundle);
             Picasso.get().load(ImageUriBundle).into(fotoClient);
 
             TextView textSave = view.findViewById(R.id.textSave);
 
             textSave.setText("Сохранить");
-           //fioClientOrder.setText("Редактировать заказ");
+           fioClientOrder.setText("Редактировать заказ");
 
             btnCreateOrder.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -201,12 +200,7 @@ public class FragmentFormOrder extends Fragment {
 
                     uploadData(Fio,Category, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd);
 
-                    Toast.makeText(btnCreateOrder.getContext(), "Заказ изменен", Toast.LENGTH_SHORT).show();
-
-                    FragmentListOrder fragment_add_order = new FragmentListOrder();
-                    FragmentTransaction ft = getParentFragmentManager().beginTransaction();
-                    ft.replace(R.id.add_client, fragment_add_order);
-                    ft.commit();
+                    Toast.makeText(btnCreateOrder.getContext(), "Изменения сохраняются", Toast.LENGTH_SHORT).show();
                 }
 
             });
@@ -265,7 +259,7 @@ public class FragmentFormOrder extends Fragment {
             public void onComplete(@NonNull Task<Uri> task) {
                 uploadUri = task.getResult();
 
-                Orders order = new Orders(Key,CategoryKey, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd, uploadUri.toString());
+                Orders order = new Orders(Key,CategoryKey, DiscriptionСondition, DiscriptionProblem, DateStart, DateEnd, uploadUri.toString(), "Ожидает ремонта");
 
                 DatabaseReference db = FirebaseDatabase.getInstance().getReference();
                 if (keyOrder == null) {
@@ -273,6 +267,11 @@ public class FragmentFormOrder extends Fragment {
                 } else {
                     db.child("Orders").child(keyOrder).setValue(order);
                 }
+
+                FragmentListOrder fragment_add_order = new FragmentListOrder();
+                FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+                ft.replace(R.id.add_client, fragment_add_order);
+                ft.commit();
             }
         });
     }

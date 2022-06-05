@@ -1,7 +1,7 @@
 package ru.ermilov.servicecenter;
 
 public class Orders {
-    public String Fio, CategoryKey, Condition, Problema, DateStart, DateEnd, ImageUri;
+    public String Fio, CategoryKey, Condition, Problema, DateStart, DateEnd, ImageUri, Status;
     public String keyOrder;
     public String Category;
 
@@ -9,7 +9,7 @@ public class Orders {
 
     }
 
-    public Orders( String Fio ,String CategoryKey, String Condition, String Problema, String DateStart, String DateEnd, String ImageUri){
+    public Orders( String Fio ,String CategoryKey, String Condition, String Problema, String DateStart, String DateEnd, String ImageUri, String Status){
 
         this.Fio = Fio;
         this.CategoryKey = CategoryKey;
@@ -18,5 +18,6 @@ public class Orders {
         this.DateStart = DateStart;
         this.DateEnd = DateEnd;
         this.ImageUri = ImageUri;
+        this.Status = Status;
     }
 }

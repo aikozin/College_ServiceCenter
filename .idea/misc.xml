@@ -3,13 +3,32 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/Alex/StudioProjects/College_ServiceCenter/app/src/main/res/layout/fragment_form_order.xml" value="0.2930253623188406" />
-        <entry key="..\:/Users/Alex/StudioProjects/College_ServiceCenter/app/src/main/res/layout/fragment_list_client.xml" value="0.15052083333333333" />
-        <entry key="..\:/Users/Alex/StudioProjects/College_ServiceCenter/app/src/main/res/layout/item_client.xml" value="0.15052083333333333" />
+        <entry key="..\:/Users/Alex/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/activity_main.xml" value="0.365625" />
+        <entry key="..\:/Users/Alex/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/fragment_add_client.xml" value="0.365625" />
+        <entry key="..\:/Users/Alex/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/fragment_add_order.xml" value="0.1778115501519757" />
+        <entry key="..\:/Users/Alex/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/fragment_form_client.xml" value="0.365625" />
+        <entry key="..\:/Users/Alex/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/fragment_form_order.xml" value="0.33" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/drawable/background_activity_login.xml" value="0.1535" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/drawable/ic_baseline_description_24.xml" value="0.2595" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/drawable/ic_baseline_edit.xml" value="0.2595" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/drawable/icon.xml" value="0.162" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/activity_login.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/activity_main.xml" value="0.4" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/fragment_add_client.xml" value="0.17708333333333334" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/fragment_add_order.xml" value="0.2" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/fragment_form_client.xml" value="0.176" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/fragment_form_order.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/fragment_list_client.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/fragment_list_order.xml" value="0.18070652173913043" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/item_client.xml" value="0.264" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/layout/item_order.xml" value="0.536" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/menu/context_menu.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.213" />
+        <entry key="..\:/Users/pc/AndroidStudioProjects/College_ServiceCenter/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

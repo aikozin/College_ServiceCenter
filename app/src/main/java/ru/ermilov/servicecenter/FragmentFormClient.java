@@ -33,6 +33,7 @@ public class FragmentFormClient extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_form_client, container, false);
 
+        TextView textTitle = view.findViewById(R.id.textTitle);
         EditText etFio = view.findViewById(R.id.etFio);
         EditText etPhone = view.findViewById(R.id.etPhone);
         EditText etEmail = view.findViewById(R.id.etEmail);
@@ -59,6 +60,7 @@ public class FragmentFormClient extends Fragment {
                     clickBack();
                 }
             });
+
         } else {
             String key = bundle.getString("key");
             String fioBundle = bundle.getString("fio");
@@ -68,6 +70,10 @@ public class FragmentFormClient extends Fragment {
             etEmail.setText(emailBundle);
             etPhone.setText(phoneBundle);
 
+            TextView textSave = view.findViewById(R.id.textSave);
+
+            textSave.setText("Сохранить");
+            textTitle.setText("Редактировать  клиента");
 
             btnCreateClient.setOnClickListener(v -> {
                 String fio = etFio.getText().toString();

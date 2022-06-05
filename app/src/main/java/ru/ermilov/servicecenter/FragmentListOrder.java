@@ -2,6 +2,7 @@ package ru.ermilov.servicecenter;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,7 +14,13 @@ import androidx.fragment.app.FragmentTransaction;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -23,6 +30,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,17 +39,27 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 
 public class FragmentListOrder extends Fragment {
 
+    TextView tvDateEnd;
     private CardView buttonAddOrder;
     private DatabaseReference db;
     List<Orders> allOrdersList = new ArrayList<>();
     List<Orders> filterOrderList = new ArrayList<>();
     List<Categories> categories = new ArrayList<>();
+    public static final int statys1 = 101;
+    public static final int statys2 = 102;
+    public static final int statys3 = 103;
+    public String positionKeyOrder = "";
+    public int positionIdOrder = 0;
 
 
 
@@ -55,6 +74,8 @@ public class FragmentListOrder extends Fragment {
                              Bundle savedInstanceState) {
 
        View view = inflater.inflate(R.layout.fragment_list_order, container, false);
+
+
 
         db = FirebaseDatabase.getInstance().getReference();
 
@@ -89,10 +110,13 @@ public class FragmentListOrder extends Fragment {
                     allOrdersList.add(orders);
                 }
                 filterOrderList = allOrdersList;
+                filterOrderList = sort(filterOrderList);
                 listViewOrders.setAdapter(new AdapterOrders(container.getContext()));
             }
 
         } );
+
+
 
         EditText search = view.findViewById(R.id.search);
         search.addTextChangedListener(new TextWatcher() {
@@ -123,6 +147,34 @@ public class FragmentListOrder extends Fragment {
 
     }
 
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo){
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        menu.add(Menu.NONE, statys1, Menu.NONE, "Ожидает ремонта");
+        menu.add(Menu.NONE, statys2, Menu.NONE, "Ремонтируется");
+        menu.add(Menu.NONE, statys3, Menu.NONE, "Ремонт завершен");
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item)
+    {
+        String status = item.getTitle().toString();
+        Orders order = filterOrderList.get(positionIdOrder);
+        order.Status = status;
+        db.child("Orders").child(positionKeyOrder).setValue(order).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(getActivity(), "Статус заказа изменен", Toast.LENGTH_SHORT).show();
+                FragmentListOrder fragment = new FragmentListOrder();
+                FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+                ft.replace(R.id.add_client, fragment);
+                ft.commit();
+            }
+        });
+        return super.onContextItemSelected(item);
+    }
 
 
     class AdapterOrders extends BaseAdapter{
@@ -162,7 +214,9 @@ public class FragmentListOrder extends Fragment {
             TextView tvCondition = view.findViewById(R.id.tvCondition);
             TextView tvProblema = view.findViewById(R.id.tvProblema);
             TextView tvDateStart = view.findViewById(R.id.tvDateStart);
-            TextView tvDateEnd = view.findViewById(R.id.tvDateEnd);
+             tvDateEnd = view.findViewById(R.id.tvDateEnd);
+            TextView statys = view.findViewById(R.id.statys);
+            CardView statusColor = view.findViewById(R.id.statusColor);
 
             Picasso.get().load(filterOrderList.get(i).ImageUri).into(ivFoto);
 
@@ -170,8 +224,35 @@ public class FragmentListOrder extends Fragment {
             tvCategory.setText(filterOrderList.get(i).Category);
             tvCondition.setText(filterOrderList.get(i).Condition);
             tvProblema.setText(filterOrderList.get(i).Problema);
-            tvDateStart.setText(filterOrderList.get(i).DateStart + "/");
+            tvDateStart.setText(filterOrderList.get(i).DateStart + " | ");
             tvDateEnd.setText(filterOrderList.get(i).DateEnd);
+            statys.setText(filterOrderList.get(i).Status);
+
+            Date date = new Date(System.currentTimeMillis());
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+            String time = sdf.format(date);
+
+
+
+            switch (filterOrderList.get(i).Status) {
+                case "Ожидает ремонта":
+                    statusColor.setCardBackgroundColor(Color.parseColor("#AC3E3E"));
+                    break;
+                case "Ремонтируется":
+                    statusColor.setCardBackgroundColor(Color.parseColor("#FFC107"));
+                    break;
+                case "Ремонт завершен":
+                    statusColor.setCardBackgroundColor(Color.parseColor("#4CAF50"));
+                    tvDateEnd.setText(time);
+                    break;
+            }
+
+            registerForContextMenu(statys);
+            statys.setOnTouchListener((v, event) -> {
+                positionKeyOrder = filterOrderList.get(i).keyOrder;
+                positionIdOrder = i;
+                return false;
+            });
 
             CardView edit = view.findViewById(R.id.edit);
 
@@ -233,9 +314,28 @@ public class FragmentListOrder extends Fragment {
             });
 
 
+
             return view;
         }
     }
+    
+    public List<Orders> sort(List<Orders> orders) {
+        List<Orders> newOrders = new ArrayList<>();
+        for (int i = 0; i < orders.size(); i++) {
+            if (orders.get(i).Status.equals("Ожидает ремонта"))
+                newOrders.add(orders.get(i));
+        }
+        for (int i = 0; i < orders.size(); i++) {
+            if (orders.get(i).Status.equals("Ремонтируется"))
+                newOrders.add(orders.get(i));
+        }
+        for (int i = 0; i < orders.size(); i++) {
+            if (orders.get(i).Status.equals("Ремонт завершен"))
+                newOrders.add(orders.get(i));
 
+           // tvDateEnd.setText(time);
 
+        }
+        return newOrders;
+    }
 }

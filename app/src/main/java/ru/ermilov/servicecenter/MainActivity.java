@@ -5,6 +5,7 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 
@@ -18,8 +19,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+
         fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.add_client);
+
+
 
         if(fragment == null){
 
@@ -54,8 +60,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
-
     }
+
+    @Override
+   public void onBackPressed(){ }
 }
